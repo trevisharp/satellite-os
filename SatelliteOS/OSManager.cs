@@ -16,6 +16,18 @@ internal class OSManager
     public static void Save()
     {
         var json = JsonSerializer.Serialize(Current);
+        var final = Encript(json);
+        File.WriteAllText("save", final);  
+    }
+    public static void Load()
+    {
+        var save = File.ReadAllText("save");
+        var json = Decript(save);
+        Current = JsonSerializer.Deserialize<OSManager>(json);
+    }
+    
+    public static string Encript(string text)
+    {
         byte[] Key = Encoding.UTF8.GetBytes("minha-chave-secreta1234567890124");
         byte[] IV  = Encoding.UTF8.GetBytes("vetor-inicial-12");
         using var aes = Aes.Create();
@@ -25,15 +37,13 @@ internal class OSManager
         using var ms = new MemoryStream();
         using var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
         using var sw = new StreamWriter(cs);
-        sw.Write(json);
+        sw.Write(text);
         sw.Close();
-        var final = Convert.ToBase64String(ms.ToArray());
-        File.WriteAllText("save", final);  
+        return Convert.ToBase64String(ms.ToArray());
     }
-    public static void Load()
+    public static string Decript(string text)
     {
-        var save = File.ReadAllText("save");
-        var buffer = Convert.FromBase64String(save);
+        var buffer = Convert.FromBase64String(text);
         byte[] Key = Encoding.UTF8.GetBytes("minha-chave-secreta1234567890124");
         byte[] IV  = Encoding.UTF8.GetBytes("vetor-inicial-12");
         using var aes = Aes.Create();
@@ -43,11 +53,11 @@ internal class OSManager
         using var ms = new MemoryStream(buffer);
         using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
         using var sr = new StreamReader(cs);
-        var json = sr.ReadToEnd();
+        var txt = sr.ReadToEnd();
         sr.Close();
-        Current = JsonSerializer.Deserialize<OSManager>(json);
+        return txt;
     }
-    
+
     public readonly OSFolder Root;
     public OSFolder CurrentDir { get; set;}
 

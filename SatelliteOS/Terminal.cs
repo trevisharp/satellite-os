@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace SatelliteOS;
 
 internal class Terminal
 {
+    readonly View view;
     readonly Compiler compiler;
     readonly Form form;
     readonly Label text;
@@ -14,10 +16,11 @@ internal class Terminal
     readonly List<string> content =  [ "Satellite OS@2025" ];
     public Terminal()
     {
+        view = new View();
         compiler = new Compiler();
 
         form = new Form {
-            FormBorderStyle = FormBorderStyle.SizableToolWindow,
+            FormBorderStyle = FormBorderStyle.FixedToolWindow,
             BackColor = Color.Black,
             Width = 800,
             Height = 640,
@@ -189,6 +192,10 @@ internal class Terminal
             case "reset":
                 OSManager.Reset();
                 break;
+
+            case "view":
+                view.Show();
+                break;
             
             case "exit":
                 form.Close();
@@ -277,7 +284,8 @@ internal class Terminal
                 break;
             
             case "run":
-                var lines = OSManager.Current.CAT("program.cs");
+                var rfile = args.Length < 2 ? "program.cs" : args[1];
+                var lines = OSManager.Current.CAT(rfile);
                 var code = string.Join("\n", lines);
                 var result = compiler.GetNewAssembly([ code ], []);
                 foreach (var message in result.Item2)
@@ -288,6 +296,16 @@ internal class Terminal
                 if (result.Item1 is null)
                     break;
                 result.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
+                break;
+            
+            case "compile":
+                var cfile = args.Length < 2 ? "program.cs" : args[1];
+                var clines = OSManager.Current.CAT(cfile);
+                var ccode = string.Join("\n", clines);
+                var bin = OSManager.Encript(ccode);
+                var binname = cfile.Split('.')[0] + ".bin";
+                RunCommand($"touch {binname}");
+                RunCommand($"echo '{bin}' > {binname}");
                 break;
         }
     }
