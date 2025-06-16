@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace SatelliteOS;
 
@@ -24,6 +25,20 @@ internal class OSManager
         var save = File.ReadAllText("save");
         var json = Decript(save);
         Current = JsonSerializer.Deserialize<OSManager>(json);
+        fixParents(Current.Root);
+
+        void fixParents(OSItem item)
+        {
+            if (item is OSFolder folder)
+            {
+                foreach (var x in folder.Content)
+                {
+                    MessageBox.Show(x.Name);
+                    x.Parent = folder;
+                    fixParents(x);
+                }
+            }
+        }
     }
     
     public static string Encript(string text)
@@ -81,6 +96,49 @@ internal class OSManager
         });
 
         CurrentDir = Root;
+    }
+
+    public string MV(string start, string target)
+    {
+        var parts = start.Split(".");
+        if (parts.Length == 1)
+            return "A file needs name and extension.";
+        
+        var fileName = parts[0];
+        var extension = parts[1];
+
+        var item = CurrentDir.Content.FirstOrDefault(
+            i => i is OSFile f && f.ItemName == start
+        );
+        if (item is null)
+            return $"unknow file named '{start}'.";
+        
+        item.Parent.Remove(item);
+        item.Parent = null;
+        
+        var it = CurrentDir;
+        var moves = target.Split("/");
+        foreach (var mov in moves[..^1])
+        {
+            if (mov == "..")
+            {
+                it = it.Parent;
+                continue;
+            }
+
+            var next = it.Content
+                .FirstOrDefault(f => f.Name == mov);
+            
+            if (next is null || next is not OSFolder folder)
+                return $"unknown folder '{next}'.";
+            
+            it = folder;
+        }
+
+        item.Name = moves[^1].Split(".")[0];
+        item.Parent = it;
+        it.Add(item);
+        return "";
     }
 
     public string PWD()

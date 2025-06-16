@@ -220,6 +220,16 @@ internal class Terminal
                 var rmresult = OSManager.Current.RM(args[0]);
                 Append(rmresult);
                 break;
+                
+            case "mv":
+                if (args.Count != 2)
+                {
+                    Append("mv expected 2 arguments.");
+                    break;
+                }
+                var mvresult = OSManager.Current.MV(args[0], args[1]);
+                Append(mvresult);
+                break;
             
             case "touch":
                 if (args.Count == 0)
