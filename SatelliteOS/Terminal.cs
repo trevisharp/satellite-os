@@ -70,7 +70,7 @@ internal class Terminal
                 baseChar = baseChar.ToUpper();
             if (e.Shift)
                 baseChar = baseChar.ToUpper();
-
+            
             if (e.Shift && e.KeyCode == Keys.D9)
                 baseChar = "(";
             else if (e.Shift && e.KeyCode == Keys.D0)
@@ -87,6 +87,8 @@ internal class Terminal
                 baseChar = "/";
             else if (e.KeyCode == Keys.ShiftKey)
                 baseChar = "";
+            else if (e.KeyCode == Keys.ControlKey)
+                baseChar = "";
             else if (!e.Shift && e.KeyCode == Keys.Oemplus)
                 baseChar = "=";
             else if (e.Shift && e.KeyCode == Keys.Oemplus)
@@ -100,6 +102,8 @@ internal class Terminal
                 baseChar = "\"";
             else if (e.KeyCode == Keys.Enter && onstring)
                 baseChar = "\n";
+            else if (e.Control && e.KeyCode == Keys.V)
+                baseChar = Clipboard.GetText();
             
             text.Text += baseChar;
             content[^1] += baseChar;

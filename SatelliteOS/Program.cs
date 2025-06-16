@@ -1,5 +1,13 @@
+using System;
 using SatelliteOS;
 
-ApplicationConfiguration.Initialize();
-var terminal = new Terminal();
-terminal.Start();
+class Program
+{
+    [STAThread]
+    private static void Main(string[] args)
+    {
+        ApplicationConfiguration.Initialize();
+        var terminal = new Terminal();
+        terminal.Start();
+    }
+}
