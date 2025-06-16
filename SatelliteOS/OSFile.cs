@@ -1,6 +1,6 @@
 namespace SatelliteOS;
 
-public class OSFile : OSItem
+internal class OSFile : OSItem
 {
     public string Extension { get; set; }
     public string Content { get; set; }

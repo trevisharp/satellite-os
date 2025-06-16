@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace SatelliteOS;
 
-public class OSFolder : OSItem
+internal class OSFolder : OSItem
 {
     [JsonIgnore]
     public IEnumerable<OSItem> Content => 

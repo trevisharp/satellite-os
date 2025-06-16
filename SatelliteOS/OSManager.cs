@@ -5,13 +5,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace SatelliteOS;
 
-public class OSManager
+internal class OSManager
 {
     public static OSManager Current { get; private set; } = new();
     public static void Reset() 

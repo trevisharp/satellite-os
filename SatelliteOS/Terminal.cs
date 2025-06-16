@@ -1,16 +1,21 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace SatelliteOS;
 
-public class Terminal
+internal class Terminal
 {
+    readonly Compiler compiler;
     readonly Form form;
     readonly Label text;
+    readonly Timer timer;
     readonly List<string> content =  [ "Satellite OS@2025" ];
     public Terminal()
     {
+        compiler = new Compiler();
+
         form = new Form {
             FormBorderStyle = FormBorderStyle.SizableToolWindow,
             BackColor = Color.Black,
@@ -48,6 +53,8 @@ public class Terminal
             {
                 if (content[^1].Length == 4)
                     return;
+                if (content[^1][^1] == '\'')
+                    onstring = !onstring;
                 content[^1] = content[^1][..^1];
                 UpdateText();
                 return;
@@ -56,7 +63,18 @@ public class Terminal
             var baseChar = ((char)e.KeyValue)
                 .ToString()
                 .ToLower();
-            if (e.KeyCode == Keys.OemPeriod && e.Shift)
+            if (Control.IsKeyLocked(Keys.CapsLock) && !e.Shift)
+                baseChar = baseChar.ToUpper();
+            if (e.Shift)
+                baseChar = baseChar.ToUpper();
+
+            if (e.Shift && e.KeyCode == Keys.D9)
+                baseChar = "(";
+            else if (e.Shift && e.KeyCode == Keys.D0)
+                baseChar = ")";
+            else if (e.KeyCode == Keys.Oem2)
+                baseChar = ";";
+            else if (e.KeyCode == Keys.OemPeriod && e.Shift)
                 baseChar = ">";
             else if (e.KeyCode == Keys.OemPeriod)
                 baseChar = ".";
@@ -64,19 +82,42 @@ public class Terminal
                 baseChar = "/";
             else if (e.KeyCode == Keys.ShiftKey)
                 baseChar = "";
-            else if (e.KeyCode == Keys.Oemtilde)
+            else if (!e.Shift && e.KeyCode == Keys.Oemplus)
+                baseChar = "=";
+            else if (e.Shift && e.KeyCode == Keys.Oemplus)
+                baseChar = "+";
+            else if (!e.Shift && e.KeyCode == Keys.Oemtilde)
             {
-                baseChar = "\'";
+                baseChar = "'";
                 onstring = !onstring;
             }
+            else if (e.Shift && e.KeyCode == Keys.Oemtilde)
+                baseChar = "\"";
             else if (e.KeyCode == Keys.Enter && onstring)
-            {
                 baseChar = "\n";
-            }
             
             text.Text += baseChar;
             content[^1] += baseChar;
         };
+
+        timer = new Timer {
+            Interval = 50
+        };
+        timer.Tick += (o, e) =>
+        {
+            if (OS.Buffer.IsEmpty)
+                return;
+            
+            while (OS.Buffer.TryDequeue(out var message))
+            {
+                content.Insert(
+                    content.Count - 1,
+                    message
+                );
+            }
+            UpdateText();
+        };
+        form.Load += (o, e) => timer.Start();
 
         form.Controls.Add(text);
     }
@@ -145,6 +186,10 @@ public class Terminal
                 OSManager.Load();
                 break;
             
+            case "reset":
+                OSManager.Reset();
+                break;
+            
             case "exit":
                 form.Close();
                 break;
@@ -204,9 +249,45 @@ public class Terminal
                 );
                 Append(echoresult);
                 break;
+            
+            case "dotnet":
+                RunDotnet([ ..args ]);
+                break;
 
             default:
                 Append($"unknow command '{command}'.");
+                break;
+        }
+    }
+
+    void RunDotnet(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Append("dotnet 9.0.0");
+            AppendLine();
+            return;
+        }
+
+        switch (args[0])
+        {
+            case "new":
+                RunCommand("touch program.cs");
+                RunCommand("echo 'OS.WriteLine(\"Hello, World!\");' > program.cs");
+                break;
+            
+            case "run":
+                var lines = OSManager.Current.CAT("program.cs");
+                var code = string.Join("\n", lines);
+                var result = compiler.GetNewAssembly([ code ], []);
+                foreach (var message in result.Item2)
+                {
+                    Append(message);
+                    AppendLine();
+                }
+                if (result.Item1 is null)
+                    break;
+                result.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
                 break;
         }
     }

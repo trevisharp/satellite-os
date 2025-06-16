@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace SatelliteOS;
 
-public abstract class OSItem
+internal abstract class OSItem
 {
     public string Name { get; set; }
     
