@@ -137,6 +137,14 @@ public class Terminal
                 Clear();
                 break;
             
+            case "save":
+                OSManager.Save();
+                break;
+            
+            case "load":
+                OSManager.Load();
+                break;
+            
             case "exit":
                 form.Close();
                 break;
