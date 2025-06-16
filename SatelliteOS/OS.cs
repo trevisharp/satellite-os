@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Collections.Concurrent;
 
 public static class OS
@@ -9,4 +10,7 @@ public static class OS
         foreach (var item in message.Split("\n"))
             Buffer.Enqueue(item);
     }
+
+    public static void Sleep(int millis)
+        => Thread.Sleep(millis);
 }
