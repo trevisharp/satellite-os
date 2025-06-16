@@ -75,6 +75,8 @@ internal class Terminal
                 baseChar = "(";
             else if (e.Shift && e.KeyCode == Keys.D0)
                 baseChar = ")";
+            else if (e.Shift && e.KeyCode == Keys.D7)
+                baseChar = "&";
             else if (e.KeyCode == Keys.Oem2)
                 baseChar = ";";
             else if (e.KeyCode == Keys.OemPeriod && e.Shift)
@@ -181,12 +183,12 @@ internal class Terminal
                 Clear();
                 break;
             
-            case "save":
-                OSManager.Save();
-                break;
-            
             case "load":
                 OSManager.Load();
+                break;
+            
+            case "save":
+                OSManager.Save();
                 break;
             
             case "reset":
@@ -272,7 +274,12 @@ internal class Terminal
                 break;
 
             default:
-                Append($"unknow command '{command}'.");
+                var runres = OSManager.Current.Run(prompt);
+                foreach (var item in runres)
+                {
+                    Append(item);
+                    AppendLine();
+                }
                 break;
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace SatelliteOS;
@@ -26,14 +27,14 @@ internal class OSManager
         var json = Decript(save);
         Current = JsonSerializer.Deserialize<OSManager>(json);
         fixParents(Current.Root);
-
-        void fixParents(OSItem item)
+        Current.CurrentDir = Current.Root;
+        
+        static void fixParents(OSItem item)
         {
             if (item is OSFolder folder)
             {
                 foreach (var x in folder.Content)
                 {
-                    MessageBox.Show(x.Name);
                     x.Parent = folder;
                     fixParents(x);
                 }
@@ -74,7 +75,8 @@ internal class OSManager
     }
 
     public readonly OSFolder Root;
-    public OSFolder CurrentDir { get; set;}
+    public OSFolder CurrentDir { get; set; }
+    public OSFolder BinaryFolder { get; set; }
 
     public OSManager()
     {
@@ -90,12 +92,43 @@ internal class OSManager
             Parent = Root
         };
         Root.Add(userFolder);
-        userFolder.Add(new OSFolder {
+        userFolder.Add(BinaryFolder = new OSFolder {
             Name = "bin",
             Parent = userFolder
         });
 
         CurrentDir = Root;
+    }
+
+    public string[] Run(string command)
+    {
+        var parts = command.Split(" ");
+        var item = BinaryFolder.Files.FirstOrDefault(
+            x => x.Name == parts[0]
+        );
+        if (item is not OSFile file)
+            return [ $"unknow command '{parts[0]}'." ];
+        
+        var bin = file.Content;
+        var code = Decript(bin);
+
+        if (command.Contains('&'))
+        {
+            var thread = new Thread(() =>
+            {
+                var compiler = new Compiler();
+                var assembly = compiler.GetNewAssembly([ code ], []);
+                assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
+            });
+            thread.Start();
+        }
+        else
+        {
+            var compiler = new Compiler();
+            var assembly = compiler.GetNewAssembly([ code ], []);
+            assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
+        }
+        return [ "" ];
     }
 
     public string MV(string start, string target)

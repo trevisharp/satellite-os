@@ -7,8 +7,16 @@ namespace SatelliteOS;
 internal class OSFolder : OSItem
 {
     [JsonIgnore]
-    public IEnumerable<OSItem> Content => 
-        Folders.AsEnumerable<OSItem>().Concat(Files);
+    public IEnumerable<OSItem> Content
+    {
+        get
+        {
+            foreach (var file in Files)
+                yield return file;
+            foreach (var folders in Folders)
+                yield return folders;
+        }
+    }
 
     public List<OSFile> Files { get; set; } = [];
     public List<OSFolder> Folders { get; set; } = [];
