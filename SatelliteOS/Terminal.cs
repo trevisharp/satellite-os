@@ -6,7 +6,7 @@ namespace SatelliteOS;
 
 internal class Terminal
 {
-    View view;
+    SatelliteView view;
     readonly Compiler compiler;
     readonly Form form;
     readonly Label text;
@@ -203,7 +203,7 @@ internal class Terminal
                 break;
 
             case "view":
-                view = new View();
+                view = new SatelliteView();
                 view.Show();
                 break;
             

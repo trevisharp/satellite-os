@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SatelliteOS;
 
-internal class View
+internal class SatelliteView
 {
     readonly Form form;
     readonly Bitmap image;
@@ -20,7 +20,7 @@ internal class View
     float yVel = 0;
     float mass = 100;
 
-    public View()
+    public SatelliteView()
     {
         form = new Form {
             Width = 800,
@@ -58,11 +58,13 @@ internal class View
         var dy = yPos - 400;
         var dist2 = dx * dx + dy * dy;
         var dist = MathF.Sqrt(dist2);
+        
         if (dist < EarthRadius)
         {
             timer.Stop();
             MessageBox.Show("A missão falhou!");
             form.Close();
+            return;
         }
 
         var force = EarthMass * mass / dist2;
