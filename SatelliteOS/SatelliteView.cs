@@ -58,7 +58,7 @@ internal class SatelliteView
         var dy = yPos - 400;
         var dist2 = dx * dx + dy * dy;
         var dist = MathF.Sqrt(dist2);
-        
+
         if (dist < EarthRadius)
         {
             timer.Stop();
@@ -66,6 +66,8 @@ internal class SatelliteView
             form.Close();
             return;
         }
+
+        // var m1Force = OS.Actuators
 
         var force = EarthMass * mass / dist2;
         var ux = dx / dist;

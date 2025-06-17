@@ -84,6 +84,10 @@ internal class Terminal
                 baseChar = "<";
             else if (e.KeyCode == Keys.OemMinus)
                 baseChar = "-";
+            else if (e.KeyCode == Keys.Oem6 && e.Shift)
+                baseChar = "{";
+            else if (e.KeyCode == Keys.OemPipe && e.Shift)
+                baseChar = "}";
             else if (e.KeyCode == Keys.OemPeriod)
                 baseChar = ".";
             else if (e.KeyValue == 193)
