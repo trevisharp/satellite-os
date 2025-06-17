@@ -136,7 +136,7 @@ internal class Terminal
 
     void RunCommand(string prompt)
     {
-        var parts = prompt.Split(" ");
+        var parts = prompt.Split(' ');
         var command = parts[0].ToLower();
         var args = new List<string>();
         bool instring = false;
@@ -296,7 +296,7 @@ internal class Terminal
     {
         if (args.Length == 0)
         {
-            Append("dotnet 9.0.0");
+            Append("dotnet 8.0.0");
             AppendLine();
             return;
         }

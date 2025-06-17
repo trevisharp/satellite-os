@@ -13,14 +13,17 @@ namespace SatelliteOS;
 internal class OSManager
 {
     public static OSManager Current { get; private set; } = new();
+    
     public static void Reset() 
         => Current = new();
+    
     public static void Save()
     {
         var json = JsonSerializer.Serialize(Current);
         var final = Encript(json);
         File.WriteAllText("save", final);  
     }
+    
     public static void Load()
     {
         var save = File.ReadAllText("save");
@@ -57,24 +60,32 @@ internal class OSManager
         sw.Close();
         return Convert.ToBase64String(ms.ToArray());
     }
+    
     public static string Decript(string text)
     {
-        var buffer = Convert.FromBase64String(text);
-        byte[] Key = Encoding.UTF8.GetBytes("minha-chave-secreta1234567890124");
-        byte[] IV  = Encoding.UTF8.GetBytes("vetor-inicial-12");
-        using var aes = Aes.Create();
-        aes.Key = Key;
-        aes.IV = IV;
-        using var decryptor = aes.CreateDecryptor();
-        using var ms = new MemoryStream(buffer);
-        using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
-        using var sr = new StreamReader(cs);
-        var txt = sr.ReadToEnd();
-        sr.Close();
-        return txt;
+        try
+        {
+            var buffer = Convert.FromBase64String(text);
+            byte[] Key = Encoding.UTF8.GetBytes("minha-chave-secreta1234567890124");
+            byte[] IV  = Encoding.UTF8.GetBytes("vetor-inicial-12");
+            using var aes = Aes.Create();
+            aes.Key = Key;
+            aes.IV = IV;
+            using var decryptor = aes.CreateDecryptor();
+            using var ms = new MemoryStream(buffer);
+            using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+            using var sr = new StreamReader(cs);
+            var txt = sr.ReadToEnd();
+            sr.Close();
+            return txt;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-    public readonly OSFolder Root;
+    public OSFolder Root { get; set; }
     public OSFolder CurrentDir { get; set; }
     public OSFolder BinaryFolder { get; set; }
 
@@ -111,6 +122,8 @@ internal class OSManager
         
         var bin = file.Content;
         var code = Decript(bin);
+        if (code is null)
+            return [ "the selected file is not a executable." ];
 
         if (command.Contains('&'))
         {
