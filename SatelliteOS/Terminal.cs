@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
 
 namespace SatelliteOS;
 
 internal class Terminal
 {
+    List<string> history = [];
+    int historicPosition = 0;
     SatelliteView view;
     readonly Compiler compiler;
     readonly Form form;
@@ -41,6 +44,7 @@ internal class Terminal
         {
             if (e.KeyCode == Keys.Enter && !onstring)
             {
+                historicPosition = 0;
                 var command = content[^1][4..];
                 AppendLine();
                 RunCommand(command);
@@ -49,7 +53,7 @@ internal class Terminal
                 UpdateText();
                 return;
             }
-
+           
             if (e.KeyCode == Keys.Back)
             {
                 if (content[^1].Length == 4)
@@ -61,14 +65,45 @@ internal class Terminal
                 return;
             }
 
+
             var baseChar = ((char)e.KeyValue)
                 .ToString()
                 .ToLower();
+
+            if (e.KeyCode == Keys.Up)
+            {
+                historicPosition += 1;
+                if (historicPosition > history.Count)
+                {
+                    historicPosition -= 1;
+                    return;
+                }
+                content[^1] = "";
+                InitCommand();
+                content[^1] += history[^historicPosition];
+                UpdateText();
+                return;
+            }
+            if (e.KeyCode == Keys.Down)
+            {
+                historicPosition -= 1;
+                if (historicPosition < 1)
+                {
+                    historicPosition = 1;
+                    return;
+                }
+                content[^1] = "";
+                InitCommand();
+                content[^1] += history[^historicPosition];
+                UpdateText();
+                return;
+            }
+
+            
             if (Control.IsKeyLocked(Keys.CapsLock) && !e.Shift)
-                baseChar = baseChar.ToUpper();
+                    baseChar = baseChar.ToUpper();
             if (e.Shift)
                 baseChar = baseChar.ToUpper();
-
             if (e.Shift && e.KeyCode == Keys.D9)
                 baseChar = "(";
             else if (e.Shift && e.KeyCode == Keys.D0)
@@ -141,6 +176,8 @@ internal class Terminal
 
     void RunCommand(string prompt)
     {
+        history.Add(prompt);
+
         var parts = prompt.Split(' ');
         var command = parts[0].ToLower();
         var args = new List<string>();
