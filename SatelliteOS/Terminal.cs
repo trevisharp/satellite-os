@@ -67,8 +67,6 @@ internal class Terminal
                 baseChar = baseChar.ToUpper();
             if (e.Shift)
                 baseChar = baseChar.ToUpper();
-            
-            MessageBox.Show(e.KeyCode.ToString());
 
             if (e.Shift && e.KeyCode == Keys.D9)
                 baseChar = "(";
@@ -84,6 +82,8 @@ internal class Terminal
                 baseChar = ",";
             else if (e.KeyCode == Keys.Oemcomma && e.Shift)
                 baseChar = "<";
+            else if (e.KeyCode == Keys.OemMinus)
+                baseChar = "-";
             else if (e.KeyCode == Keys.OemPeriod)
                 baseChar = ".";
             else if (e.KeyValue == 193)
