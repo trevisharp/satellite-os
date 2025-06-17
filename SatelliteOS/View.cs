@@ -12,9 +12,11 @@ internal class View
     readonly PictureBox pb;
     readonly Timer timer;
 
+    const float EarthMass = 150 * 1600;
+    const float EarthRadius = 100;
     float xPos = 400;
     float yPos = 250;
-    float xVel = 40;
+    float xVel = 0;
     float yVel = 0;
     float mass = 100;
 
@@ -51,14 +53,21 @@ internal class View
 
     void Move()
     {
-        // xVel * xVel = M / 150
         var dt = 0.05f;
         var dx = xPos - 400;
         var dy = yPos - 400;
         var dist2 = dx * dx + dy * dy;
-        var force = 150 * 1600 * mass / dist2;
-        var ux = dx / MathF.Sqrt(dist2);
-        var uy = dy / MathF.Sqrt(dist2);
+        var dist = MathF.Sqrt(dist2);
+        if (dist < EarthRadius)
+        {
+            timer.Stop();
+            MessageBox.Show("A missão falhou!");
+            form.Close();
+        }
+
+        var force = EarthMass * mass / dist2;
+        var ux = dx / dist;
+        var uy = dy / dist;
 
         xVel -= force * ux * dt / mass;
         yVel -= force * uy * dt / mass;
@@ -71,7 +80,11 @@ internal class View
     {
         g.FillEllipse(
             new SolidBrush(Color.FromArgb(120, 120, 255)),
-            new RectangleF(300, 300, 200, 200)
+            new RectangleF(
+                400 - EarthRadius, 
+                400 - EarthRadius,
+                2 * EarthRadius,
+                2 * EarthRadius)
         );
         g.FillRectangle(
             new SolidBrush(Color.FromArgb(220, 220, 220)),

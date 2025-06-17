@@ -6,7 +6,7 @@ namespace SatelliteOS;
 
 internal class Terminal
 {
-    readonly View view;
+    View view;
     readonly Compiler compiler;
     readonly Form form;
     readonly Label text;
@@ -14,7 +14,6 @@ internal class Terminal
     readonly List<string> content =  [ "Satellite OS@2025" ];
     public Terminal()
     {
-        view = new View();
         compiler = new Compiler();
 
         form = new Form {
@@ -198,6 +197,7 @@ internal class Terminal
                 break;
 
             case "view":
+                view = new View();
                 view.Show();
                 break;
             
