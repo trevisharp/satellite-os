@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
@@ -176,6 +177,7 @@ internal class Terminal
 
     void RunCommand(string prompt)
     {
+        prompt = prompt.Trim();
         history.Add(prompt);
 
         var parts = prompt.Split(' ');
