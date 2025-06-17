@@ -93,7 +93,7 @@ internal class OSManager
 
     [JsonIgnore]
     public OSFolder CurrentDir { get; set; }
-    
+
     [JsonIgnore]
     public OSFolder BinaryFolder { get; set; }
 
@@ -130,20 +130,17 @@ internal class OSManager
 
     public string[] Run(string command)
     {
-        MessageBox.Show(command);
         var parts = command.Split(" ");
-        MessageBox.Show(parts[0]);
-        MessageBox.Show(BinaryFolder.Files.Count.ToString());
         var item = BinaryFolder.Files.FirstOrDefault(
             x => x.Name == parts[0]
         );
-        MessageBox.Show(item?.ToString());
+        
         if (item is not OSFile file)
             return [ $"unknow command '{parts[0]}'." ];
         
         var bin = file.Content;
         var code = Decript(bin);
-        MessageBox.Show(code);
+        
         if (code is null)
             return [ "the selected file is not a executable." ];
 
