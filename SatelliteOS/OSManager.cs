@@ -172,10 +172,9 @@ internal class OSManager
                 it = it.Parent;
                 continue;
             }
+
             if (it == null)
-            {
                 return $"invalid operation! Have you tried accessing a folder before root";
-            }
 
             var next = it.Content
                 .FirstOrDefault(f => f.Name == mov);
