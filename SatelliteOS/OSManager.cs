@@ -5,7 +5,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace SatelliteOS;
 
@@ -30,6 +32,9 @@ internal class OSManager
         Current = JsonSerializer.Deserialize<OSManager>(json);
         fixParents(Current.Root);
         Current.CurrentDir = Current.Root;
+        Current.BinaryFolder = Current.Root
+            .Folders.FirstOrDefault(f => f.Name == "usr")
+            .Folders.FirstOrDefault(f => f.Name == "bin");
         
         static void fixParents(OSItem item)
         {
@@ -85,9 +90,16 @@ internal class OSManager
     }
 
     public OSFolder Root { get; set; }
+
+    [JsonIgnore]
     public OSFolder CurrentDir { get; set; }
+    
+    [JsonIgnore]
     public OSFolder BinaryFolder { get; set; }
 
+    [JsonIgnore]
+    Dictionary<int, (string name, Thread thread)> tasks = [];
+    
     public OSManager()
     {
         Root = new() {
@@ -110,17 +122,28 @@ internal class OSManager
         CurrentDir = Root;
     }
 
+    public void StopAll()
+    {
+        foreach (var pair in tasks)
+            pair.Value.thread.Interrupt();
+    }
+
     public string[] Run(string command)
     {
+        MessageBox.Show(command);
         var parts = command.Split(" ");
+        MessageBox.Show(parts[0]);
+        MessageBox.Show(BinaryFolder.Files.Count.ToString());
         var item = BinaryFolder.Files.FirstOrDefault(
             x => x.Name == parts[0]
         );
+        MessageBox.Show(item?.ToString());
         if (item is not OSFile file)
             return [ $"unknow command '{parts[0]}'." ];
         
         var bin = file.Content;
         var code = Decript(bin);
+        MessageBox.Show(code);
         if (code is null)
             return [ "the selected file is not a executable." ];
 
@@ -132,6 +155,7 @@ internal class OSManager
                 var assembly = compiler.GetNewAssembly([ code ], []);
                 assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
             });
+            tasks[Random.Shared.Next() % 1000] = (parts[0], thread);
             thread.Start();
         }
         else
@@ -325,6 +349,31 @@ internal class OSManager
         if (symbol == ">")
             file.Content = content;
         else file.Content += content;
+        return "";
+    }
+
+    public string[] JOBS()
+    {
+        List<string> output = [];
+        output.Add("Id\tName");
+        foreach (var pair in tasks)
+            output.Add($"{pair.Key}\t{pair.Value.name}");
+        return [ ..output ];
+    }
+
+    public string KILL(string arg)
+    {
+        if (!int.TryParse(arg, out int id))
+            return $"'{arg}' needs be a number";
+        var task = tasks
+            .Where(task => task.Key == id)
+            .Select(task => task.Value.thread)
+            .FirstOrDefault();
+        
+        if (task is null)
+            return $"unknown PID '{id}'.";
+
+        task.Interrupt();
         return "";
     }
 }

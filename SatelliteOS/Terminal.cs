@@ -36,6 +36,7 @@ internal class Terminal
 
         form.KeyPreview = true;
         bool onstring = false;
+        form.FormClosing += (o, e) => OSManager.Current.StopAll();
         form.KeyDown += (o, e) =>
         {
             if (e.KeyCode == Keys.Enter && !onstring)
@@ -279,6 +280,25 @@ internal class Terminal
                     args[0], args[1], args[2]
                 );
                 Append(echoresult);
+                break;
+            
+            case "jobs":
+                var jobsreuslt = OSManager.Current.JOBS();
+                foreach (var job in jobsreuslt)
+                {
+                    Append(job);
+                    AppendLine();
+                }
+                break;
+            
+            case "kill":
+                if (args.Count == 0)
+                {
+                    Append("kill expected 1 argument.");
+                    break;
+                }
+
+
                 break;
             
             case "dotnet":
