@@ -139,6 +139,8 @@ internal class OSManager
         {
             var compiler = new Compiler();
             var assembly = compiler.GetNewAssembly([ code ], []);
+            if (assembly.Item1 is null)
+                return [ "The executable file has erros." ];
             assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
         }
         return [ "" ];
@@ -243,7 +245,8 @@ internal class OSManager
     public string RM(string name)
     {
         var item = CurrentDir.Content.FirstOrDefault(
-            i => i.Name == name
+            i => i is OSFile f && f.ItemName == name
+                || i.Name == name
         );
         if (item is null)
             return $"'{name}' does not exist in this directory.";
