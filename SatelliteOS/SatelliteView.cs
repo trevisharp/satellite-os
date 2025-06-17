@@ -67,7 +67,9 @@ internal class SatelliteView
             return;
         }
 
-        // var m1Force = OS.Actuators
+        var mxForce = OS.Actuators[0];
+        var myForce = OS.Actuators[1];
+        var mgForce = OS.Actuators[2];
 
         var force = EarthMass * mass / dist2;
         var ux = dx / dist;
