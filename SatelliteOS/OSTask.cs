@@ -27,6 +27,10 @@ internal class OSTask
 
         if (inBackgorund)
         {
+            int randIndex = Random.Shared.Next(PIDS.Count);
+            var randPID = PIDS[randIndex];
+            PIDS.RemoveAt(randIndex);
+            
             var thread = new Thread(() =>
             {
                 try
@@ -40,14 +44,10 @@ internal class OSTask
                     var message = ex.InnerException?.Message;
                     if (message is null || message is "Task Finished")
                         return;
-                    OS.WriteLine(message);
+                    OS.WriteLine($"'{message}' error on task {randPID}.");
                 }
             });
 
-            int randIndex = Random.Shared.Next(PIDS.Count);
-            var randPID = PIDS[randIndex];
-            PIDS.RemoveAt(randIndex);
-            
             var task = new OSTask {
                 PID = randPID,
                 ProcessName = file.Name,
@@ -58,11 +58,19 @@ internal class OSTask
         }
         else
         {
-            var compiler = new Compiler();
-            var assembly = compiler.GetNewAssembly([ code ], []);
-            if (assembly.Item1 is null)
-                return [ "The executable file has erros." ];
-            assembly.Item1.EntryPoint.Invoke(null, [ args ]);
+            try
+            {
+                var compiler = new Compiler();
+                var assembly = compiler.GetNewAssembly([ code ], []);
+                if (assembly.Item1 is null)
+                    return [ "The executable file has erros." ];
+                assembly.Item1.EntryPoint.Invoke(null, [ args ]);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message;
+                return [ message ];
+            }
         }
         return [ "" ];
     }

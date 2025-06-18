@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -99,7 +100,6 @@ internal class Terminal
                 UpdateText();
                 return;
             }
-
             
             if (Control.IsKeyLocked(Keys.CapsLock) && !e.Shift)
                     baseChar = baseChar.ToUpper();
@@ -154,7 +154,7 @@ internal class Terminal
         };
 
         timer = new Timer {
-            Interval = 50
+            Interval = 10
         };
         timer.Tick += (o, e) =>
         {
@@ -376,15 +376,22 @@ internal class Terminal
                 var rfile = args.Length < 2 ? "program.cs" : args[1];
                 var lines = OSManager.Current.CAT(rfile);
                 var code = string.Join("\n", lines);
-                var result = compiler.GetNewAssembly([ code ], []);
-                foreach (var message in result.Item2)
+                try
                 {
-                    Append(message);
-                    AppendLine();
+                    var result = compiler.GetNewAssembly([ code ], []);
+                    foreach (var message in result.Item2)
+                    {
+                        Append(message);
+                        AppendLine();
+                    }
+                    if (result.Item1 is null)
+                        break;
+                    result.Item1.EntryPoint.Invoke(null, [ args[1..] ]);
                 }
-                if (result.Item1 is null)
-                    break;
-                result.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
+                catch (Exception ex)
+                {
+                    Append(ex.InnerException?.Message);
+                }
                 break;
             
             case "compile":

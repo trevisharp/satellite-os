@@ -92,7 +92,7 @@ internal class SatelliteView
         if (height < 30 || height > 70)
         {
             timer.Stop();
-            MessageBox.Show("A missão falhou!");
+            MessageBox.Show("The mission failed!");
             form.Close();
             return false;
         }
@@ -110,7 +110,7 @@ internal class SatelliteView
         if (energy < 0)
         {
             timer.Stop();
-            MessageBox.Show("A missão falhou!");
+            MessageBox.Show("The mission failed!");
             form.Close();
             return false;
         }
@@ -119,7 +119,7 @@ internal class SatelliteView
         if (fuel < 0)
         {
             timer.Stop();
-            MessageBox.Show("A missão falhou!");
+            MessageBox.Show("The mission failed!");
             form.Close();
             return false;
         }
@@ -143,7 +143,7 @@ internal class SatelliteView
 
         angle += dangle * dt;
         dangle += (mgForce + 0.1f * Random.Shared.NextSingle()) * dt / mass;
-        var deltaAngle = (angle % 360) - 180;
+        var deltaAngle = (angle % 360) - 180 + 45 * MathF.Sin(t / 60);
         var charge = float.Clamp(2000 / (deltaAngle * deltaAngle), 0f, 1f);
 
         energy = float.Clamp(energy + charge * dt, 0, 100);
