@@ -96,9 +96,6 @@ internal class OSManager
 
     [JsonIgnore]
     public OSFolder BinaryFolder { get; set; }
-
-    [JsonIgnore]
-    Dictionary<int, (string name, Thread thread)> tasks = [];
     
     public OSManager()
     {
@@ -123,10 +120,7 @@ internal class OSManager
     }
 
     public void StopAll()
-    {
-        foreach (var pair in tasks)
-            pair.Value.thread.Interrupt();
-    }
+        => OSTask.KillALL();
 
     public string[] Run(string command)
     {
@@ -138,32 +132,7 @@ internal class OSManager
         if (item is not OSFile file)
             return [ $"unknow command '{parts[0]}'." ];
         
-        var bin = file.Content;
-        var code = Decript(bin);
-        
-        if (code is null)
-            return [ "the selected file is not a executable." ];
-
-        if (command.Contains('&'))
-        {
-            var thread = new Thread(() =>
-            {
-                var compiler = new Compiler();
-                var assembly = compiler.GetNewAssembly([ code ], []);
-                assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
-            });
-            tasks[Random.Shared.Next() % 1000] = (parts[0], thread);
-            thread.Start();
-        }
-        else
-        {
-            var compiler = new Compiler();
-            var assembly = compiler.GetNewAssembly([ code ], []);
-            if (assembly.Item1 is null)
-                return [ "The executable file has erros." ];
-            assembly.Item1.EntryPoint.Invoke(null, [ new string[0] ]);
-        }
-        return [ "" ];
+        return OSTask.New(file, command.Contains('&'), parts[1..]);
     }
 
     public string MV(string start, string target)
@@ -355,9 +324,9 @@ internal class OSManager
     public string[] JOBS()
     {
         List<string> output = [];
-        output.Add("Id\tName");
-        foreach (var pair in tasks)
-            output.Add($"{pair.Key}\t{pair.Value.name}");
+        output.Add("Id        Name");
+        foreach (var task in OSTask.Tasks)
+            output.Add($"{task.PID}      {task.ProcessName}");
         return [ ..output ];
     }
 
@@ -365,15 +334,7 @@ internal class OSManager
     {
         if (!int.TryParse(arg, out int id))
             return $"'{arg}' needs be a number";
-        var task = tasks
-            .Where(task => task.Key == id)
-            .Select(task => task.Value.thread)
-            .FirstOrDefault();
-        
-        if (task is null)
-            return $"unknown PID '{id}'.";
 
-        task.Interrupt();
-        return "";
+        return OSTask.Kill(id);
     }
 }

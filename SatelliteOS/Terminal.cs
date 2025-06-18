@@ -337,7 +337,8 @@ internal class Terminal
                     break;
                 }
 
-
+                var killresult = OSManager.Current.KILL(args[0]);
+                Append(killresult);
                 break;
             
             case "dotnet":
