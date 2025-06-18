@@ -53,4 +53,4 @@ Your task is use the SatelliteOS, a linux-line Operational System and program ta
 - WriteLine(object)
 - Sleep(int)
 - GetSensor(int) -> float
-- SetActuator(int , float)
+- SetActuator(int, float)

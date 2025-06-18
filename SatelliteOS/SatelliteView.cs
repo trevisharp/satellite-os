@@ -148,23 +148,12 @@ internal class SatelliteView
 
         energy = float.Clamp(energy + charge * dt, 0, 100);
 
-        // Velocidade Tangencial
         var TanVel = uy * xVel - ux * yVel;
         OS.Sensors[0] = TanVel;
-
-        // Altura
         OS.Sensors[1] = height;
-
-        // Combustivel
         OS.Sensors[2] = fuel;
-
-        // Energia
         OS.Sensors[3] = energy;
-
-        // Recarga
         OS.Sensors[4] = charge;
-
-        // Signal
         OS.Sensors[5] = MathF.Sin(5 * t);
 
         return true;
