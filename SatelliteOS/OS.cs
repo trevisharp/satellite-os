@@ -5,7 +5,7 @@ public static class OS
 {
     internal static ConcurrentQueue<string> Buffer = [];
     internal static readonly float[] Sensors = new float[6];
-    internal static readonly float[] Actuators = new float[4];
+    internal static readonly float[] Actuators = new float[3];
     public static void WriteLine(object data)
     {
         var message = data.ToString();
