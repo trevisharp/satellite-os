@@ -5,7 +5,7 @@ A educational library to learn programming and operational systems.
 
 Your task is use the SatelliteOS, a linux-line Operational System and program tasks in C# to control a satellite. Your tasks should:
 
-- Keep the satellite height between 30 and 70.
+- Keep the satellite height close to 50 and between 30 and 70 every time. 
 - Keep the satellite speed close to 40.
 - Send the received signal.
 - Rotate to maximize the energy.
@@ -46,11 +46,12 @@ Your task is use the SatelliteOS, a linux-line Operational System and program ta
 
 - 0: Tangencial Motor
 - 1: Radial Motor
-- 2: Signal
+- 2: Rotation Motor
+- 3: Signal
 
 ### OS Class functions
 
 - WriteLine(object)
 - Sleep(int)
 - GetSensor(int) -> float
-- SetActuator(int, float)
+- SetActuator(int, float) [values between -1 and 1]
