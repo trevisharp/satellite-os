@@ -189,7 +189,7 @@ internal class Terminal
         {
             if (!instring && p.StartsWith('\''))
                 instring = true;
-            else if (instring && p.EndsWith('\''))
+            if (instring && p.EndsWith('\''))
             {
                 str += p.Replace("\'", "") + " ";
                 args.Add(str);
