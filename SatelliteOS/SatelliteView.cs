@@ -99,7 +99,7 @@ internal class SatelliteView
 
         var mxForce = 400 * float.Clamp(OS.Actuators[0], -1f, 1f);
         var myForce = 400 * float.Clamp(OS.Actuators[1], -1f, 1f);
-        var mgForce = 45 * float.Clamp(OS.Actuators[2], -1f, 1f);
+        var mgForce = 450 * float.Clamp(OS.Actuators[2], -1f, 1f);
 
         if (float.Abs(mxForce) > 10)
             energy -= dt / 2;
