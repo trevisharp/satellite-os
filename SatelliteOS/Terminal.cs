@@ -400,6 +400,16 @@ internal class Terminal
                 var ccode = string.Join("\n", clines);
                 var bin = OSManager.Encript(ccode);
                 var binname = cfile.Split('.')[0] + ".bin";
+
+                var compresult = compiler.GetNewAssembly([ ccode ], []);
+                foreach (var message in compresult.Item2)
+                {
+                    Append(message);
+                    AppendLine();
+                }
+                if (compresult.Item2.Length > 0)
+                    break;
+
                 RunCommand($"touch {binname}");
                 RunCommand($"echo '{bin}' > {binname}");
                 break;

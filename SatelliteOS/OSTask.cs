@@ -36,8 +36,12 @@ internal class OSTask
                 try
                 {
                     var compiler = new Compiler();
-                    var assembly = compiler.GetNewAssembly([ code ], []);
-                    assembly.Item1.EntryPoint.Invoke(null, [ args ]);
+                    var result = compiler.GetNewAssembly([ code ], []);
+                    foreach (var message in result.Item2)
+                        OS.WriteLine(message);
+                    if (result.Item1 is null)
+                        return;
+                    result.Item1.EntryPoint.Invoke(null, [ args ]);
                 }
                 catch (Exception ex)
                 {
