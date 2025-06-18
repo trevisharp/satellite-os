@@ -82,7 +82,7 @@ internal class SatelliteView
     }
 
     bool Move(float dt)
-    {;
+    {
         var dx = xPos - 400;
         var dy = yPos - 400;
         var dist2 = dx * dx + dy * dy;
@@ -219,11 +219,11 @@ internal class SatelliteView
         );
 
         var points = signal.Select((v, i) => new PointF(
-            40f + 200f * i / 250f, 480 + 120f * (v + 1)
+            20f + 200f * i / 250f, 480 + 120f * (v + 1)
         )).ToArray();
-        g.DrawRectangle(Pens.White, 40, 480, 200, 240);
         if (points.Length > 1)
             g.DrawLines(Pens.Red, points);
+        g.DrawRectangle(Pens.White, 20, 480, 200, 240);
     }
 
     public void Show()

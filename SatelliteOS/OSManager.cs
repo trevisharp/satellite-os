@@ -120,7 +120,7 @@ internal class OSManager
     }
 
     public void StopAll()
-        => OSTask.KillALL();
+        => OSTask.InterrupAll();
 
     public string[] Run(string command)
     {

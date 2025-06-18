@@ -46,6 +46,10 @@ internal class OSTask
                         return;
                     OS.WriteLine($"'{message}' error on task {randPID}.");
                 }
+                finally
+                {
+                    tasks.Remove(randPID);
+                }
             });
 
             var task = new OSTask {
@@ -75,10 +79,10 @@ internal class OSTask
         return [ "" ];
     }
     
-    public static void KillALL()
+    public static void InterrupAll()
     {
-        foreach (var pid in PIDS)
-            Kill(pid);
+        foreach (var task in tasks.Values)
+            task.Thread.Interrupt();
     }
 
     public static string Kill(int pid)
