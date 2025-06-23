@@ -39,8 +39,9 @@ Your task is use the SatelliteOS, a linux-line Operational System and program ta
 - 0: Tangencial Speed
 - 1: Height
 - 2: Fuel
-- 3: Charge
-- 4: Antenna
+- 3: Energy
+- 4: Charge
+- 5: Antenna
 
 ### Actuators
 
