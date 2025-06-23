@@ -376,11 +376,17 @@ internal class OSManager
         var tempFile = Path.Combine(tempFolder, item.ItemName);
         File.WriteAllText(tempFile, file.Content);
 
+        List<string> vscodes = [ 
+            @"C:\Program Files\Microsoft VS Code\Code.exe",
+            @"C:\Users\disrct\AppData\Local\Programs\Microsoft VS Code\Code.exe"
+        ];
+        var vscode = vscodes.FirstOrDefault(File.Exists);
+
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = @"C:\Program Files\Microsoft VS Code\Code.exe",
+                FileName = vscode,
                 Arguments = $"--wait \"{tempFile}\"",
                 UseShellExecute = false,
                 CreateNoWindow = true,
