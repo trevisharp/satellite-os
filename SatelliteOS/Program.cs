@@ -7,7 +7,6 @@ class Program
     private static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
-        var terminal = new Terminal();
-        terminal.Start();
+        Terminal.Current.Start();
     }
 }

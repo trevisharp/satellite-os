@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -131,6 +132,18 @@ internal class OSManager
         
         if (item is not OSFile file)
             return [ $"unknow command '{parts[0]}'." ];
+        
+        if (file.Extension == "sh")
+        {
+            var script = file.Content;
+            for (int i = 0; script.Contains($"${i + 1}"); i++)
+                script = script.Replace($"${i + 1}", parts[i + 1]);
+            
+            foreach (var line in script.Split("\n"))
+                Terminal.Current.RunCommand(line);
+            
+            return [];
+        }
         
         return OSTask.New(file, command.Contains('&'), parts[1..]);
     }

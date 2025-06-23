@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace SatelliteOS;
 
 internal class Terminal
 {
+    public readonly static Terminal Current = new();
     List<string> history = [];
     int historicPosition = 0;
     SatelliteView view;
@@ -111,6 +111,8 @@ internal class Terminal
                 baseChar = ")";
             else if (e.Shift && e.KeyCode == Keys.D7)
                 baseChar = "&";
+            else if (e.Shift && e.KeyCode == Keys.D4)
+                baseChar = "$";
             else if (e.KeyCode == Keys.Oem2)
                 baseChar = ";";
             else if (e.KeyCode == Keys.OemPeriod && e.Shift)
@@ -175,7 +177,7 @@ internal class Terminal
         form.Controls.Add(text);
     }
 
-    void RunCommand(string prompt)
+    public void RunCommand(string prompt)
     {
         prompt = prompt.Trim();
         history.Add(prompt);
