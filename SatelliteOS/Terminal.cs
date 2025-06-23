@@ -346,6 +346,16 @@ internal class Terminal
             case "dotnet":
                 RunDotnet([ ..args ]);
                 break;
+            
+            case "code":
+                if (args.Count == 0)
+                {
+                    Append("code expected 1 argument.");
+                    break;
+                }
+                var vsresult = OSManager.Current.CODE(args[0]);
+                Append(vsresult);
+                break;
 
             default:
                 var runres = OSManager.Current.Run(prompt);

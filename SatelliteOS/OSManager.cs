@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -349,5 +350,48 @@ internal class OSManager
             return $"'{arg}' needs be a number";
 
         return OSTask.Kill(id);
+    }
+
+    public string CODE(string name)
+    {
+        var parts = name.Split(".");
+        if (parts.Length == 1)
+            return "A file needs name and extension.";
+        
+        var fileName = parts[0];
+        var extension = parts[1];
+
+        var item = CurrentDir.Content.FirstOrDefault(
+            i => i is OSFile f && f.ItemName == name
+        );
+        if (item is null)
+            return $"'{name}' does not exist in this directory.";
+
+        if (item is not OSFile file)
+            return $"'{name}' need be a file.";
+
+        var tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(tempFolder);
+
+        var tempFile = Path.Combine(tempFolder, item.ItemName);
+        File.WriteAllText(tempFile, file.Content);
+
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = @"C:\Program Files\Microsoft VS Code\Code.exe",
+                Arguments = $"--wait \"{tempFile}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            }
+        };
+
+        process.Start();
+        process.WaitForExit();
+
+        file.Content = File.ReadAllText(tempFile);
+
+        return "";
     }
 }
